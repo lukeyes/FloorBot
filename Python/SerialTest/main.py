@@ -15,15 +15,21 @@ def main():
     # Ramp motor 1 and motor 2 from -127 to 127(full reverse to full forward),
     # waiting 20ms(1 / 50th of a second) per value.
     for power in range(-127, 127):
-        ser.write(power.to_bytes(1, sys.byteorder))
-        ser.write(power.to_bytes(1, sys.byteorder))
+        new_power = power + 127
+        ser.write(new_power.to_bytes(1, sys.byteorder))
+        ser.write(new_power.to_bytes(1, sys.byteorder))
         time.sleep(0.02)
 
     # now go back the way we came
     for power in range(127, -127, -1):
-        ser.write(power.to_bytes(1, sys.byteorder))
-        ser.write(power.to_bytes(1, sys.byteorder))
+        new_power = power + 127
+        ser.write(new_power.to_bytes(1, sys.byteorder))
+        ser.write(new_power.to_bytes(1, sys.byteorder))
         time.sleep(0.02)
+
+    new_power = 127
+    ser.write(new_power.to_bytes(1, sys.byteorder))
+    ser.write(new_power.to_bytes(1, sys.byteorder))
 
     ser.close()
 
