@@ -28,8 +28,8 @@ def main():
         time.sleep(0.02)
 
     new_power = 127
-    ser.write(new_power.to_bytes(1, sys.byteorder))
-    ser.write(new_power.to_bytes(1, sys.byteorder))
+    #ser.write(new_power.to_bytes(1, sys.byteorder))
+    #ser.write(new_power.to_bytes(1, sys.byteorder))
 
     ser.close()
 
