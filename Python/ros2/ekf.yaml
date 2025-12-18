@@ -1,0 +1,64 @@
+### ekf_node config ###
+ekf_filter_node:
+  ros__parameters:
+    frequency: 30.0
+    sensor_timeout: 0.1
+    two_d_mode: true
+    publish_acceleration: false
+    publish_tf: true
+    map_frame: map              # Defaults to "map" if unspecified
+    odom_frame: odom            # Defaults to "odom" if unspecified
+    base_link_frame: base_link  # Defaults to "base_link" if unspecified
+    world_frame: odom           # We are doing local fusion
+
+    # -------------------------------------
+    # INPUT 1: Create 1 Wheel Odometry
+    # -------------------------------------
+    odom0: /odom
+    # Config: [x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az]
+    # We ONLY use velocity (vx, vyaw) from wheels.
+    # Wheel encoders are terrible at absolute position (x,y) due to drift.
+    odom0_config: [false, false, false,
+                   false, false, false,
+                   true,  false, false,
+                   false, false, true,
+                   false, false, false]
+    odom0_differential: false
+    odom0_queue_size: 10
+
+    # -------------------------------------
+    # INPUT 2: RealSense T265 Visual Odometry
+    # -------------------------------------
+    # T265 typically publishes on /camera/pose/sample or /camera/odom/sample
+    # Check 'ros2 topic list' to confirm.
+    odom1: /camera/pose/sample
+
+    # We trust T265 for absolute Position (x, y, yaw) AND Velocity
+    # The T265 is incredibly accurate, so we use almost everything.
+    odom1_config: [true,  true,  false,
+                   false, false, true,
+                   true,  true,  false,
+                   false, false, true,
+                   false, false, false]
+    odom1_differential: false
+    odom1_queue_size: 10
+
+    # -------------------------------------
+    # Process Noise Covariance (Tuning)
+    # -------------------------------------
+    # If the T265 jumps around, increase these values.
+    process_noise_covariance: [0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                               0,    0.05, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                               0,    0,    0.06, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                               0,    0,    0,    0.03, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                               0,    0,    0,    0,    0.03, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                               0,    0,    0,    0,    0,    0.06, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                               0,    0,    0,    0,    0,    0,    0.025, 0,     0,    0,    0,    0,    0,    0,    0,
+                               0,    0,    0,    0,    0,    0,    0,     0.025, 0,    0,    0,    0,    0,    0,    0,
+                               0,    0,    0,    0,    0,    0,    0,     0,     0.04, 0,    0,    0,    0,    0,    0,
+                               0,    0,    0,    0,    0,    0,    0,     0,     0,    0.01, 0,    0,    0,    0,    0,
+                               0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0.01, 0,    0,    0,    0,
+                               0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.02, 0,    0,    0,
+                               0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.01, 0,    0,
+                               0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.01, 0,
+                               0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.015]
